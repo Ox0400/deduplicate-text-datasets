@@ -17,6 +17,7 @@ import time
 import sys
 import multiprocessing as mp
 import numpy as np
+import subprocess
 
 import ray
 from ray import remote
@@ -94,10 +95,10 @@ print("Merging suffix trees")
 os.popen("rm tmp/out.table.bin.*").read()
 
 torun = " --suffix-path ".join(files)
-print("./target/debug/dedup_dataset merge --output-file %s --suffix-path %s --num-threads %d"%("tmp/out.table.bin", torun, mp.cpu_count()))
-pipe = os.popen("./target/debug/dedup_dataset merge --output-file %s --suffix-path %s --num-threads %d"%("tmp/out.table.bin", torun, mp.cpu_count()))
-output = pipe.read()
-if pipe.close() is not None:
+cmd = "./target/debug/dedup_dataset merge --output-file %s --suffix-path %s --num-threads %d"%("tmp/out.table.bin", torun, mp.cpu_count())
+print(cmd)
+sub = subprocess.Popen(cmd, shell=True)
+if sub.wait():
     print("Something went wrong with merging.")
     print("Please check that you ran with ulimit -Sn 100000")
     exit(1)
